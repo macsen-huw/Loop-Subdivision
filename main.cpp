@@ -27,13 +27,13 @@
 #include "DirectedEdgeSurface.h"
 #include "RenderParameters.h"
 #include "RenderController.h"
+#include "TriConverter.h"
 
 // main routine
 int main(int argc, char **argv)
     { // main()
     // initialize QT
     QApplication renderApp(argc, argv);
-
     // check the args to make sure there's an input file
     if (argc != 2) 
         { // bad arg count
@@ -42,6 +42,35 @@ int main(int argc, char **argv)
         // and leave
         return 0;
         } // bad arg count
+
+    std::string fileType = "";
+    bool dot = false;
+
+    //Check that it's either a .diredgenormal or .tri file
+    for(int i = 0; i < 100; i++)
+    {
+        int a = argv[1][i];
+
+        if(a == 0)
+            break;
+
+        if(a == 46)
+        {
+            dot = true;
+            continue;
+        }
+
+        if(dot == true)
+        {
+            fileType.push_back(argv[1][i]);
+        }
+    }
+
+    if(! (fileType == "tri" || fileType == "diredgenormal") )
+    {
+        std::cout << "Error: Argument is not a .diredgenormal or .tri file" << std::endl;
+        return 0;
+    }
 
     //Create a vector of DirectedEdgeSurfaces (i.e. a vector of meshes)
     std::vector<DirectedEdgeSurface> meshes;
@@ -52,12 +81,30 @@ int main(int argc, char **argv)
     // open the input files for the geometry & texture
     std::ifstream geometryFile(argv[1]);
 
-    // try reading it
-    if (!(geometryFile.good()) || (!DirectedEdgeSurface.ReadObjectStream(geometryFile)))
-        { // object read failed 
+    if (!(geometryFile.good()) )
+    {
         std::cout << "Read failed for object " << argv[1] << " or texture " << argv[2] << std::endl;
         return 0;
-        } // object read failed
+    }
+
+
+    //If it's a tri file, we must convert to a directed edge file
+    if(fileType == "tri")
+    {
+        TriConverter triConv;
+        DirectedEdgeSurface = triConv.convertTriFile(geometryFile);
+    }
+
+   else
+    {
+        // try reading it
+        if ((!DirectedEdgeSurface.ReadObjectStream(geometryFile)))
+            { // object read failed
+            std::cout << "Read failed for object " << argv[1] << " or texture " << argv[2] << std::endl;
+            return 0;
+            } // object read failed
+    }
+
 
     // dump the file to out
 //     DirectedEdgeSurface.WriteObjectStream(std::cout);
