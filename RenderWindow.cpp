@@ -73,7 +73,12 @@ RenderWindow::RenderWindow
     //Buttons to increase/decrease subdivision
     increaseSubdivisionButton  = new QPushButton                ("Next Subdivision Level", this);
     decreaseSubdivisionButton  = new QPushButton                 ("Previous Subdivision Level", this);
-    
+    exportSurface               = new QPushButton               ("Export File", this);
+
+    //QComboBox for the file format selection
+    exportFileType = new QComboBox(this);
+    exportFileType->addItems({".tri", ".diredgenormal", ".obj"});
+
     // labels for sliders and arcballs
     modelRotatorLabel           = new QLabel                    ("Model",               this);
     lightRotatorLabel           = new QLabel                    ("Light",               this);
@@ -112,6 +117,9 @@ RenderWindow::RenderWindow
     windowLayout->addWidget(increaseSubdivisionButton,  nStacked+2, 1,          1,          1           );
     windowLayout->addWidget(decreaseSubdivisionButton,  nStacked+3, 1,          1,          1           );
 
+    windowLayout->addWidget(exportFileType, nStacked+2, 3, 1, 1);
+    windowLayout->addWidget(exportSurface, nStacked + 3, 3, 1, 1);
+
     // now reset all of the control elements to match the render parameters passed in
     ResetInterface();
     } // RenderWindow::RenderWindow()
@@ -124,6 +132,9 @@ void RenderWindow::ResetInterface()
     // set check boxes
     showVerticesBox    	    ->setChecked        (renderParameters   ->  showVertices);
     flatNormalsBox    	    ->setChecked        (renderParameters   ->  useFlatNormals);
+
+    //Set Combo Box
+    exportFileType->setCurrentIndex(renderParameters->chosenFileType);
     
     // set sliders
     // x & y translate are scaled to notional unit sphere in render widgets
@@ -156,4 +167,5 @@ void RenderWindow::ResetInterface()
     vertexSizeSlider        ->update();
     showVerticesBox		    ->update();
     flatNormalsBox		    ->update();
+    exportFileType->update();
     } // RenderWindow::ResetInterface()

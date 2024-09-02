@@ -216,43 +216,105 @@ bool DirectedEdgeSurface::ReadObjectStream(std::istream &geometryStream)
     } // ReadObjectStream()
 
 // write routine
-void DirectedEdgeSurface::WriteObjectStream(std::ostream &geometryStream)
+void DirectedEdgeSurface::WriteObjectStream(std::ostream &geometryStream, int fileType)
     { // WriteObjectStream()
-	geometryStream << "#" << std::endl; 
-	geometryStream << "# Created for Leeds COMP 5821M Autumn 2020" << std::endl; 
-	geometryStream << "#" << std::endl; 
-	geometryStream << "#" << std::endl; 
-	geometryStream << "# Surface vertices=" << vertices.size() << " faces=" << faceVertices.size()/3 << std::endl; 
-	geometryStream << "#" << std::endl; 
 
-	// output the vertices
-    for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
-        geometryStream << "Vertex " << vertex << " " << std::fixed << vertices[vertex] << std::endl;
 
-    // and the normal vectors
-    for (unsigned int normal = 0; normal < normals.size(); normal++)
-        geometryStream << "Normal " << normal << " " << std::fixed << normals[normal] << std::endl;
+    if(fileType == TRI)
+    {
+        //Structure of a tri file:
+        /*
+            Number of vertices
 
-	// and the first directed edges
-    for (unsigned int vertex = 0; vertex < firstDirectedEdge.size(); vertex++)
-        geometryStream << "FirstDirectedEdge " << vertex<< " " << std::fixed << firstDirectedEdge[vertex] << std::endl;
+            (List of all faces)
+            x1 y1 z1
+            x2 y2 z2
+            ...
+         */
 
-    // and the faces - increment is taken care of internally
-    for (unsigned int face = 0; face < faceVertices.size(); )
-        { // per face
-        geometryStream << "Face " << face << " ";
-        
-        // read in three vertices
-        geometryStream << faceVertices[face++] << " ";
-        geometryStream << faceVertices[face++] << " ";
-        geometryStream << faceVertices[face++];
-            
-        geometryStream << std::endl;
-        } // per face
+        geometryStream << vertices.size() << std::endl;
 
-	// and the other halves
-	for (unsigned int dirEdge = 0; dirEdge < otherHalf.size(); dirEdge++)
-		geometryStream << "OtherHalf " << dirEdge << " " << otherHalf[dirEdge] << std::endl;
+        for(unsigned int i = 0; i < faceVertices.size(); i+=3)
+            geometryStream << std::fixed << vertices[faceVertices[i]] << std::endl << vertices[faceVertices[i+1]] << std::endl << vertices[faceVertices[i+2]] << " " << std::endl;
+
+    }
+
+    //Export diredgenormal file
+    else if(fileType == DIREDGENORMAL)
+    {
+
+        //Structure of a diredgenormal file:
+        /*
+            Vertices
+            Normals
+            FirstDirectedEdges
+            Faces
+            OtherHalf
+         */
+        geometryStream << "#" << std::endl;
+        geometryStream << "# vertices=" << vertices.size() << " faces=" << faceVertices.size()/3 << std::endl;
+        geometryStream << "#" << std::endl;
+
+        // output the vertices
+        for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
+            geometryStream << "Vertex " << vertex << " " << std::fixed << vertices[vertex] << std::endl;
+
+        // and the normal vectors
+        for (unsigned int normal = 0; normal < normals.size(); normal++)
+            geometryStream << "Normal " << normal << " " << std::fixed << normals[normal] << std::endl;
+
+        // and the first directed edges
+        for (unsigned int vertex = 0; vertex < firstDirectedEdge.size(); vertex++)
+            geometryStream << "FirstDirectedEdge " << vertex<< " " << std::fixed << firstDirectedEdge[vertex] << std::endl;
+
+        // and the faces - increment is taken care of internally
+        for (unsigned int face = 0; face < faceVertices.size() / 3; face++)
+            { // per face
+            geometryStream << "Face " << face << " ";
+
+            int index = face * 3;
+            // read in three vertices
+            geometryStream << faceVertices[index] << " ";
+            geometryStream << faceVertices[index+1] << " ";
+            geometryStream << faceVertices[index+2];
+
+            geometryStream << std::endl;
+            } // per face
+
+        // and the other halves
+        for (unsigned int dirEdge = 0; dirEdge < otherHalf.size(); dirEdge++)
+            geometryStream << "OtherHalf " << dirEdge << " " << otherHalf[dirEdge] << std::endl;
+    }
+
+    //Export an OBJ file (much more widely supported)
+    else if (fileType == OBJ)
+    {
+        //First of all, print general info
+        geometryStream << "#" << std::endl;
+        geometryStream << "# Vertices = " << vertices.size() << " Faces = " << faceVertices.size()/3 << std::endl;
+        geometryStream << "#" << std::endl;
+
+        //Output vertices and normals together
+        for (unsigned int vertex = 0; vertex < vertices.size(); vertex++)
+        {
+            geometryStream << "v " << std::fixed << vertices[vertex] << std::endl;
+            geometryStream << "vn " << std::fixed << normals[vertex] << std::endl;
+
+        }
+
+        //Output faces
+        //Note - OBJ begins vertex and face counting from 1 rather than 0
+        //We deal with this by incrementing each value by 1
+        for (unsigned int i = 0; i < faceVertices.size(); i += 3)
+        {
+            geometryStream << "f" << " ";
+            geometryStream << faceVertices[i] + 1 << " ";
+            geometryStream << faceVertices[i+1] + 1 << " ";
+            geometryStream << faceVertices[i+2] + 1 << std::endl;
+        }
+
+    }
+
     } // WriteObjectStream()
 
 // routine to render

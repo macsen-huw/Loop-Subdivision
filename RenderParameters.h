@@ -52,6 +52,8 @@ class RenderParameters
 
     //Subdivision level (default = 0)
     int subdivisionLevel;
+
+    int chosenFileType;
     // constructor
     RenderParameters()
         :
@@ -61,7 +63,8 @@ class RenderParameters
         useFlatNormals(true),
         showVertices(true),
         vertexSize(0.25),
-        subdivisionLevel(0)
+        subdivisionLevel(0),
+        chosenFileType(0)
         { // constructor
         
         // start the lighting at the viewer's direction

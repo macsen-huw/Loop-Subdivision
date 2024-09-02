@@ -68,6 +68,10 @@ class RenderWindow : public QWidget
     //Button for subdivisions
     QPushButton                 *increaseSubdivisionButton;
     QPushButton                 *decreaseSubdivisionButton;
+    QPushButton                 *exportSurface;
+
+    //Combo box for file typ
+    QComboBox                   *exportFileType;
 
     // labels for sliders & arcballs
     QLabel                      *modelRotatorLabel;

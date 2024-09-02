@@ -85,6 +85,12 @@ RenderController::RenderController
     QObject::connect(   renderWindow->decreaseSubdivisionButton, 	SIGNAL(released()),
                         this,                                       SLOT(subdivisionDecreased()));
 
+    QObject::connect( renderWindow->exportFileType, SIGNAL(currentIndexChanged(int)),
+                      this,                         SLOT(fileTypeChanged(int)));
+
+    QObject::connect(renderWindow->exportSurface, SIGNAL(released()),
+                     this,                        SLOT(exportCheckChanged()));
+
     // copy the rotation matrix from the widgets to the model
     renderParameters->rotationMatrix = renderWindow->modelRotator->RotationMatrix();
     renderParameters->lightMatrix = renderWindow->lightRotator->RotationMatrix();
@@ -219,6 +225,45 @@ void RenderController::subdivisionDecreased()
     }
 
     //Reset Interface
+    renderWindow->ResetInterface();
+}
+
+//Slot for changing the combo box value
+void RenderController::fileTypeChanged(int value)
+{
+    renderParameters->chosenFileType = value;
+
+    renderWindow->ResetInterface();
+}
+
+//Slot for changing state of export button
+void RenderController::exportCheckChanged()
+{
+    int type;
+    std::string title;
+    if(renderParameters->chosenFileType == 2)
+    {
+        type = OBJ;
+        title = "surface.obj";
+    }
+
+
+    else if(renderParameters->chosenFileType == 1)
+    {
+       type = DIREDGENORMAL;
+       title = "surface.diredgenormal";
+    }
+
+    else if(renderParameters->chosenFileType == 0)
+    {
+        type = TRI;
+        title = "surface.tri";
+    }
+
+
+    std::ofstream outputFile(title);
+    directedEdgeSurface->at(renderParameters->subdivisionLevel).WriteObjectStream(outputFile, type);
+
     renderWindow->ResetInterface();
 }
      

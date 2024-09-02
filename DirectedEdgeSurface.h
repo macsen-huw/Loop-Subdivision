@@ -44,6 +44,13 @@
 // the image class for a texture
 #include "RGBAImage.h" 
 
+enum fileTypes
+{
+    TRI,
+    DIREDGENORMAL,
+    OBJ
+};
+
 class DirectedEdgeSurface
     { // class DirectedEdgeSurface
     public:
@@ -75,7 +82,7 @@ class DirectedEdgeSurface
     bool ReadObjectStream(std::istream &geometryStream);
 
     // write routine
-    void WriteObjectStream(std::ostream &geometryStream);
+    void WriteObjectStream(std::ostream &geometryStream, int fileType);
 
     // routine to render
     void Render(RenderParameters *renderParameters);

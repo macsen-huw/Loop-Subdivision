@@ -21,6 +21,8 @@
 #ifndef _RENDER_CONTROLLER_H
 #define _RENDER_CONTROLLER_H
 
+#include <fstream>
+
 // QT headers
 #include <QtGui>
 #include <QMouseEvent>
@@ -82,6 +84,9 @@ class RenderController : public QObject
     
     void subdivisionIncreased();
     void subdivisionDecreased();
+
+    void fileTypeChanged(int value);
+    void exportCheckChanged();
 
     // slots for responding to widget manipulations
     void MouseDown(int whichButton, int x, int y);
